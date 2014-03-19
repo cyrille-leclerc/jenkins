@@ -375,49 +375,12 @@ public class CLI {
 //        h.setLevel(ALL);
 //        l.addHandler(h);
 //
-        Authenticator.setDefault(new Authenticator() {
-            String httpProxyUser = System.getProperty("http.proxyUser", null);
-            String httpProxyPassword = System.getProperty("http.proxyPassword", null);
-            String httpsProxyUser = System.getProperty("https.proxyUser", null);
-            String httpsProxyPassword = System.getProperty("https.proxyPassword", null);
-
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                System.err.println("getPasswordAuthentication(" +
-                                "host=" + getRequestingHost() + ", " +
-                                "protocol=" + getRequestingProtocol() + ", " +
-                                "scheme=" + getRequestingScheme() + ", " +
-                                "port=" + getRequestingPort() + ", " +
-                                "requestingSite=" + getRequestingSite() + ", " +
-                                "requestingUrl=" + getRequestingURL() + ", " +
-                                "requestorType=" + getRequestorType() +
-                                ")"
-
-                );
-                if (getRequestorType() == RequestorType.PROXY) {
-                    if ("http".equals(getRequestingProtocol())) {
-                        if (httpProxyUser == null || httpProxyPassword == null) {
-                            System.err.println("No username/password defined for http proxy authentication");
-                        } else {
-                            System.err.println("Use http proxy auth with user=" + httpProxyUser + ", password=***");
-                            return new PasswordAuthentication(httpProxyUser, httpProxyPassword.toCharArray());
-                        }
-                    } else if ("https".equals(getRequestingProtocol())) {
-                        if (httpProxyUser == null || httpProxyPassword == null) {
-                            System.err.println("No username/password defined for https proxy authentication");
-                        } else {
-                            System.err.println("Use https proxy auth with user=" + httpsProxyUser + ", password=***");
-                            return new PasswordAuthentication(httpsProxyUser, httpsProxyPassword.toCharArray());
-                        }
-                    }
-                }
-                return super.getPasswordAuthentication();
-            }
-        });
         System.exit(_main(_args));
     }
 
     public static int _main(String[] _args) throws Exception {
+        ProxyAuthenticator.setDefault(new ProxyAuthenticator());
+
         List<String> args = Arrays.asList(_args);
         PrivateKeyProvider provider = new PrivateKeyProvider();
         boolean sshAuthRequestedExplicitly = false;
